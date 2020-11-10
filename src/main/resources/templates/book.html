@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="lv">
+<head>
+    <title th:text="${book.title}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link th:href="@{/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/bootstrap.min.js}" rel="stylesheet">
+</head>
+<body>
+<div>
+    <h1 th:text="${book.title}"></h1>
+    <p th:text="'Gads: ' + ${book.publishingYear}"></p>
+    <p>
+        <span>Autori: </span>
+        <span th:each="a, stat : ${book.authors}">
+        <a th:href="@{/(author=${a.firstName} + ' ' + ${a.lastName})}"
+           th:text="${a.firstName} + ' ' + ${a.lastName}"></a>
+        <span th:unless="${stat.last}">, </span>
+    </span>
+    </p>
+    <p th:text="'Izdevējs: ' + ${book.publisher}"></p>
+    <div>
+        <form th:action="@{/book/{id}/author(id=${book.id})}" method="post">
+            <div class="form-group">
+                <label for="author-name">Pievienot autoru</label>
+                <input id="author-name"
+                       type="text"
+                       class="form-control"
+                       placeholder="Autora vārds"
+                       name="authorName">
+            </div>
+            <button type="submit" class="btn btn-primary">Pievienot</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

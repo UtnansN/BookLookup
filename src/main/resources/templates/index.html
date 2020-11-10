@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="lv">
+    <head>
+        <title>Grāmatas</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link th:href="@{/bootstrap.min.css}" rel="stylesheet">
+        <link th:href="@{/bootstrap.min.js}" rel="stylesheet">
+    </head>
+    <body>
+        <h1>Grāmatu uzskaites sistēma</h1>
+        <a class="btn btn-primary" th:href="@{/book/add}">Pievienot grāmatu</a>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">Nosaukums</th>
+                    <th scope="col">Izdošanas gads</th>
+                    <th scope="col">Izdevējs</th>
+                    <!--<th scope="col">Autori</th>-->
+                    <th scope="col">Hipersaite</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="book : ${books}">
+                    <td th:text="${book.title}"></td>
+                    <td th:text="${book.publishingYear}"></td>
+                    <td th:text="${book.publisher}"></td>
+                    <td>
+                        <a class="btn btn-primary btn-sm" th:href="@{/book/{id}(id=${book.id})}">Skatīt</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
+</html>
