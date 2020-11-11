@@ -1,5 +1,6 @@
 package com.utnans.books.entity;
 
+import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,16 +12,18 @@ import java.util.List;
 public class Book {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotNull
     private String title;
 
+    @Column(name = "year")
     private Integer publishingYear;
 
     private String publisher;
 
     @ManyToMany(mappedBy = "books")
-    @OrderBy("lastName, firstName")
+    @OrderBy("name")
     private List<Author> authors;
 }

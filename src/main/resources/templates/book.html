@@ -4,19 +4,22 @@
     <title th:text="${book.title}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link th:href="@{/bootstrap.min.css}" rel="stylesheet">
-    <link th:href="@{/bootstrap.min.js}" rel="stylesheet">
 </head>
 <body>
 <div>
+    <header th:insert="header.html :: header"></header>
     <h1 th:text="${book.title}"></h1>
     <p th:text="'Gads: ' + ${book.publishingYear}"></p>
     <p>
-        <span>Autori: </span>
+        <span th:switch="${#lists.size(book.authors)}">
+            <span th:case="${0}">Autors nav norādīts</span>
+            <span th:case="${1}">Autors: </span>
+            <span th:case="*">Autori: </span>
+        </span>
         <span th:each="a, stat : ${book.authors}">
-        <a th:href="@{/(author=${a.firstName} + ' ' + ${a.lastName})}"
-           th:text="${a.firstName} + ' ' + ${a.lastName}"></a>
-        <span th:unless="${stat.last}">, </span>
-    </span>
+            <a th:href="@{/(author=${a.name})}" th:text="${a.name}"></a>
+            <span th:unless="${stat.last}">, </span>
+        </span>
     </p>
     <p th:text="'Izdevējs: ' + ${book.publisher}"></p>
     <div>

@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -37,37 +37,39 @@ public class BookService {
         book.setPublishingYear(bookDTO.getPublishingYear());
         book.setPublisher(bookDTO.getPublisher());
         bookRepository.save(book);
+
+        List<Author> authors = Arrays.stream(bookDTO.getAuthors().split(","))
+                .map(String::trim)
+                .filter(Predicate.not(String::isEmpty))
+                .distinct()
+                .map(this::createOrFetchAuthorObject)
+                .collect(Collectors.toList());
+
+        authors.forEach(author -> author.getBooks().add(book));
+        authorRepository.saveAll(authors);
         return book;
     }
 
-    public void addAuthor(Long bookID, String authorName) {
+    public void addAuthorToExistingBook(Long bookID, String authorName) {
         Book book = bookRepository.findById(bookID).orElseThrow(EntityNotFoundException::new);
-        String[] splitName = authorName.split(" ");
+        Author author = createOrFetchAuthorObject(authorName);
+        if (book.getAuthors().stream().anyMatch(ba -> ba.getId().equals(author.getId()))) return;
+        author.getBooks().add(book);
+        authorRepository.save(author);
+    }
 
-        String firstName, lastName;
-        if (splitName.length == 0) return;
-        lastName = splitName[splitName.length-1];
-
-        // Middle names ignored for now
-        Optional<Author> author;
-        if (splitName.length == 1) {
-            firstName = "";
-            author = authorRepository.findAuthorByLastName(lastName);
-        } else {
-            firstName = splitName[0];
-            author = authorRepository.findAuthorByFirstNameAndLastName(firstName, lastName);
-        }
+    private Author createOrFetchAuthorObject(String name) {
+        Optional<Author> author = authorRepository.findAuthorByName(name);
 
         if (author.isPresent()) {
             // If author is found, then the book is updated with a reference to that author
-            book.getAuthors().add(author.get());
+            return author.get();
         } else {
-            // If author with name is not found, add a new author and add the book to the author's published books
+            // If author with name is not found, create a new author object
             Author newAuthor = new Author();
-            newAuthor.setFirstName(firstName);
-            newAuthor.setLastName(lastName);
-            newAuthor.setBooks(List.of(book));
-            authorRepository.save(newAuthor);
+            newAuthor.setName(name);
+            newAuthor.setBooks(new ArrayList<>());
+            return newAuthor;
         }
     }
 }
