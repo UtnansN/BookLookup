@@ -1,61 +1,80 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org" lang="lv">
 <head>
-    <title>Grāmatu reģistrs</title>
+    <title>Books</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link th:href="@{/bootstrap.min.css}" rel="stylesheet">
     <link rel="icon" type="image/png" th:href="@{/icon.png}"/>
 </head>
 <body>
 <header th:insert="header.html :: header"></header>
-<div class="container mb-1 mt-4">
-    <div class="row justify-content-start">
-        <form th:action="@{/book(asd=asf)}" method="post">
-            <div class="form-row my-2">
+<div class="container-fluid mt-4">
+    <div class="row mt-2">
+        <form class="col-4" method="get">
+            <div class="form-row">
                 <div class="col-2">
-                    <label for="search-input">Meklēt</label>
+                    <label for="search-input">Search</label>
                 </div>
-                <div class="col-10">
-                    <input id="search-input"
+                <div class="col-6">
+                    <input th:field="*{searchQuery}"
+                           id="search-input"
+                           name="query"
                            type="text"
                            class="form-control col"
-                           placeholder="Meklēt...">
+                           placeholder="Search...">
                 </div>
-            </div>
-            <div class="form-row my-2">
-                <div class="col-md-2">
-                    <label for="order-criteria-input">Kārtot pēc</label>
-                </div>
-                <div class="col-5">
-                    <select id="order-criteria-input" class="form-control">
-                        <option value="title">Nosaukuma</option>
-                        <option value="year">Gada</option>
-                        <option value="publisher">Izdevēja</option>
-                    </select>
-                </div>
-                <div class="col-5">
-                    <select id="order-direction-input" class="form-control col">
-                        <option value="asc">Augošā secībā</option>
-                        <option value="desc">Dilstošā secībā</option>
+                <div class="col-4">
+                    <select th:field="*{searchField}"
+                            id="search-field-input"
+                            name="field"
+                            class="form-control">
+                        <option value="title">Title</option>
+                        <option value="year">Publishing year</option>
+                        <option value="publisher">Publisher</option>
+                        <option value="author">Author</option>
                     </select>
                 </div>
             </div>
             <div class="form-row my-2">
-                <button type="submit" class="btn btn-primary">Atlasīt</button>
-                <a type="button" th:href="@{/}" class="btn btn-primary">Notīrīt filtrus</a>
+                <div class="col-2">
+                    <label for="sort-criteria-input">Order by</label>
+                </div>
+                <div class="col-6">
+                    <select th:field="*{sortCriteria}" id="sort-criteria-input" class="form-control">
+                        <option value="title">Title</option>
+                        <option value="year">Year</option>
+                        <option value="publisher">Publisher</option>
+                    </select>
+                </div>
+                <div class="col-4">
+                    <select th:field="*{sortDirection}" id="sort-direction-input" class="form-control col">
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row justify-content-start my-2">
+                <div class="col-3">
+                    <button type="submit" class="btn btn-primary btn-block">Search</button>
+                </div>
+                <div class="col-3">
+                    <a type="button" th:href="@{/}" class="btn btn-primary btn-block">Clear filters</a>
+                </div>
             </div>
         </form>
     </div>
 </div>
+<hr/>
 <div class="container-fluid my-2">
+    <h3>Books</h3>
     <table class="table table-bordered">
         <thead>
         <tr>
-            <th scope="col">Nosaukums</th>
-            <th scope="col">Izdošanas gads</th>
-            <th scope="col">Izdevējs</th>
+            <th scope="col">Title</th>
+            <th scope="col">Publishing year</th>
+            <th scope="col">Publisher</th>
             <!--<th scope="col">Autori</th>-->
-            <th scope="col">Lapa</th>
+            <th scope="col">Page</th>
         </tr>
         </thead>
         <tbody>
@@ -64,7 +83,7 @@
             <td th:text="${book.publishingYear}"></td>
             <td th:text="${book.publisher}"></td>
             <td>
-                <a class="btn btn-primary btn-sm" th:href="@{/book/{id}(id=${book.id})}">Skatīt</a>
+                <a class="btn btn-primary btn-sm" th:href="@{/book/{id}(id=${book.id})}">View</a>
             </td>
         </tr>
         </tbody>

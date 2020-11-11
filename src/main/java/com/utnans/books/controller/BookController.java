@@ -21,6 +21,10 @@ public class BookController {
     public String getBookPage(@RequestParam(required = false) Map<String, String> params, Model model) {
         List<Book> bookList = bookService.getBooks(params);
         model.addAttribute("books", bookList);
+        model.addAttribute("searchQuery", "");
+        model.addAttribute("searchField", "");
+        model.addAttribute("sortCriteria", "");
+        model.addAttribute("sortDirection", "");
         return "index";
     }
 

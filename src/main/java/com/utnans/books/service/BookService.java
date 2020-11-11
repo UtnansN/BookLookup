@@ -51,6 +51,9 @@ public class BookService {
     }
 
     public void addAuthorToExistingBook(Long bookID, String authorName) {
+        authorName = authorName.trim();
+        if (authorName.isEmpty()) return;
+
         Book book = bookRepository.findById(bookID).orElseThrow(EntityNotFoundException::new);
         Author author = createOrFetchAuthorObject(authorName);
         if (book.getAuthors().stream().anyMatch(ba -> ba.getId().equals(author.getId()))) return;

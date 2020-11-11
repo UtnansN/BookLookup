@@ -4,36 +4,41 @@
     <title th:text="${book.title}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link th:href="@{/bootstrap.min.css}" rel="stylesheet">
+    <link rel="icon" type="image/png" th:href="@{/icon.png}"/>
 </head>
 <body>
 <div>
     <header th:insert="header.html :: header"></header>
-    <h1 th:text="${book.title}"></h1>
-    <p th:text="'Gads: ' + ${book.publishingYear}"></p>
-    <p>
+    <div class="container my-5">
+        <h1 th:text="${book.title}"></h1>
+        <hr/>
+        <p th:text="'Publishing year: ' + ${book.publishingYear}"></p>
+        <p>
         <span th:switch="${#lists.size(book.authors)}">
-            <span th:case="${0}">Autors nav norādīts</span>
-            <span th:case="${1}">Autors: </span>
-            <span th:case="*">Autori: </span>
+            <span th:case="${0}">Author not specified</span>
+            <span th:case="${1}">Author: </span>
+            <span th:case="*">Authors: </span>
         </span>
-        <span th:each="a, stat : ${book.authors}">
+            <span th:each="a, stat : ${book.authors}">
             <a th:href="@{/(author=${a.name})}" th:text="${a.name}"></a>
             <span th:unless="${stat.last}">, </span>
         </span>
-    </p>
-    <p th:text="'Izdevējs: ' + ${book.publisher}"></p>
-    <div>
-        <form th:action="@{/book/{id}/author(id=${book.id})}" method="post">
-            <div class="form-group">
-                <label for="author-name">Pievienot autoru</label>
-                <input id="author-name"
-                       type="text"
-                       class="form-control"
-                       placeholder="Autora vārds"
-                       name="authorName">
-            </div>
-            <button type="submit" class="btn btn-primary">Pievienot</button>
-        </form>
+        </p>
+        <p th:text="'Publisher: ' + ${book.publisher}"></p>
+        <hr/>
+        <div>
+            <form th:action="@{/book/{id}/author(id=${book.id})}" method="post">
+                <div class="form-group">
+                    <label for="author-name">Add an author</label>
+                    <input id="author-name"
+                           type="text"
+                           class="form-control"
+                           placeholder="Name"
+                           name="authorName">
+                </div>
+                <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+        </div>
     </div>
 </div>
 </body>
