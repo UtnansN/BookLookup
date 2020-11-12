@@ -6,6 +6,9 @@ import com.utnans.books.entity.Book;
 import com.utnans.books.repository.AuthorRepository;
 import com.utnans.books.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -23,7 +26,39 @@ public class BookService {
     private BookRepository bookRepository;
 
     public List<Book> getBooks(Map<String, String> params) {
-        return bookRepository.findAll();
+
+        if (params.containsKey("query") && !params.get("query").trim().isEmpty()) {
+            String query = params.get("query").trim();
+            String criteria = params.get("criteria");
+
+            Book book = new Book();
+            switch(criteria) {
+                case "title":
+                    book.setTitle(query);
+                    break;
+                case "year":
+                    book.setPublishingYear(Integer.parseInt(query));
+                    break;
+                case "publisher":
+                    book.setPublisher(query);
+                    break;
+                case "author":
+                    return bookRepository.findAllByAuthorsNameContaining(query);
+                default:
+                    return bookRepository.findAll();
+            }
+
+            ExampleMatcher matcher = ExampleMatcher.matchingAny()
+                    .withIgnoreNullValues()
+                    .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
+                    .withIgnoreCase();
+
+            Example<Book> bookExample = Example.of(book, matcher);
+            return bookRepository.findAll(bookExample);
+        }
+        else {
+            return bookRepository.findAll();
+        }
     }
 
     public Book getBookById(Long id) {

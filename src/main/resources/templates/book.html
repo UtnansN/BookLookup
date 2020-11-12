@@ -19,8 +19,8 @@
             <span th:case="${1}">Author: </span>
             <span th:case="*">Authors: </span>
         </span>
-            <span th:each="a, stat : ${book.authors}">
-            <a th:href="@{/(author=${a.name})}" th:text="${a.name}"></a>
+        <span th:each="a, stat : ${book.authors}">
+            <a th:href="@{/(query=${a.name}, criteria=${'author'})}" th:text="${a.name}"></a>
             <span th:unless="${stat.last}">, </span>
         </span>
         </p>

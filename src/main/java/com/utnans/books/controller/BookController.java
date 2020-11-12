@@ -18,13 +18,9 @@ public class BookController {
     private BookService bookService;
 
     @GetMapping
-    public String getBookPage(@RequestParam(required = false) Map<String, String> params, Model model) {
+    public String getBookPage(Model model, @RequestParam Map<String, String> params) {
         List<Book> bookList = bookService.getBooks(params);
         model.addAttribute("books", bookList);
-        model.addAttribute("searchQuery", "");
-        model.addAttribute("searchField", "");
-        model.addAttribute("sortCriteria", "");
-        model.addAttribute("sortDirection", "");
         return "index";
     }
 
@@ -35,7 +31,7 @@ public class BookController {
     }
 
     @GetMapping("/book/{id}")
-    public String getBookByID(@PathVariable Long id, Model model) {
+    public String getBookByID(Model model, @PathVariable Long id) {
         Book book = bookService.getBookById(id);
         model.addAttribute("book", book);
         return "book";
@@ -52,10 +48,4 @@ public class BookController {
         bookService.addAuthorToExistingBook(id, authorName);
         return "redirect:/book/" + id;
     }
-
-    @GetMapping("/book/search")
-    public String getAdvancedSearchPage() {
-        return "search";
-    }
-
 }
