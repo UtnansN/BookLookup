@@ -10,20 +10,19 @@
 <header th:insert="header.html :: header"></header>
 <div class="container-fluid mt-4">
     <div class="row mt-2">
-        <form class="col-4" method="get">
+        <form class="col-4" th:object="${searchDTO}" method="get">
             <label for="search-input">Search</label>
             <div class="form-row">
                 <div class="col-6">
                     <input id="search-input"
-                           th:name="query"
+                           th:field="*{query}"
                            type="text"
                            class="form-control col"
-                           placeholder="Search..."
-                           required>
+                           placeholder="Search...">
                 </div>
                 <div class="col-4">
                     <select id="search-field-input"
-                            th:name="criteria"
+                            th:field="*{criteria}"
                             class="form-control">
                         <option value="title">Title</option>
                         <option value="year">Publishing year</option>
@@ -58,7 +57,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="book : ${books}">
+        <tr th:each="book : ${books.content}">
             <td th:text="${book.id}"></td>
             <td th:text="${book.title}"></td>
             <td th:text="${book.publishingYear}"></td>
@@ -76,8 +75,37 @@
         </tr>
         </tbody>
     </table>
-    <div th:if="${#lists.size(books) == 0}" class="mt-2">
+    <div th:if="${#lists.size(books.content) == 0}" class="mt-2">
         <h2 class="text-center">No books found!</h2>
+    </div>
+    <div>
+        <!-- I'll admit this pagination navbar part is very hacky. -->
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li th:class="'page-item'+${books.isFirst() ? ' disabled' : ''}">
+                    <a class="page-link"
+                       th:href="@{/(query=${searchDTO.query}, criteria=${searchDTO.criteria}, size=${books.size})}">Start</a>
+                </li>
+                <li th:class="'page-item'+${books.isFirst() ? ' disabled' : ''}">
+                    <a class="page-link"
+                       th:href="@{/(query=${searchDTO.query}, criteria=${searchDTO.criteria},
+                       page=${books.number}, size=${books.size})}">Prev</a>
+                </li>
+                <li class="page-item active">
+                    <span class="page-link" th:text="${books.number+1}"></span>
+                </li>
+                <li th:class="'page-item'+${books.isLast() ? ' disabled' : ''}">
+                    <a class="page-link"
+                       th:href="@{/(query=${searchDTO.query}, criteria=${searchDTO.criteria},
+                       page=${books.number+2}, size=${books.size})}">Next</a>
+                </li>
+                <li th:class="'page-item'+${books.isLast() ? ' disabled' : ''}">
+                    <a class="page-link"
+                       th:href="@{/(query=${searchDTO.query}, criteria=${searchDTO.criteria},
+                       page=${books.totalPages}, size=${books.size})}">End</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
 </body>

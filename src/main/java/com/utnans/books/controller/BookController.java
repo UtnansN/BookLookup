@@ -1,15 +1,17 @@
 package com.utnans.books.controller;
 
 import com.utnans.books.dto.BookDTO;
+import com.utnans.books.dto.SearchDTO;
 import com.utnans.books.entity.Book;
 import com.utnans.books.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import java.util.HashMap;
 
 @Controller("/")
 public class BookController {
@@ -18,9 +20,16 @@ public class BookController {
     private BookService bookService;
 
     @GetMapping
-    public String getBookPage(Model model, @RequestParam Map<String, String> params) {
-        List<Book> bookList = bookService.getBooks(params);
-        model.addAttribute("books", bookList);
+    public String getBookPage(Model model, @ModelAttribute SearchDTO searchDTO, Pageable pageable) {
+        if (searchDTO == null) searchDTO = new SearchDTO();
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("query", searchDTO.getQuery());
+        params.put("criteria", searchDTO.getCriteria());
+
+        Page<Book> bookPage = bookService.getBooks(params, pageable);
+        model.addAttribute("books", bookPage);
+        model.addAttribute("searchDTO", searchDTO);
         return "index";
     }
 

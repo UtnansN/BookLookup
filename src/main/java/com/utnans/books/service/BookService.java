@@ -10,6 +10,8 @@ import com.utnans.books.repository.PublisherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +33,7 @@ public class BookService {
     private PublisherRepository publisherRepository;
 
     // Used the Example API for this because I did not know it before and it looked interesting.
-    public List<Book> getBooks(Map<String, String> params) {
-
+    public Page<Book> getBooks(Map<String, String> params, Pageable pageable) {
         if (params.containsKey("query") && !params.get("query").trim().isEmpty()) {
             String query = params.get("query").trim();
             String criteria = params.get("criteria");
@@ -46,7 +47,7 @@ public class BookService {
                     try {
                         book.setPublishingYear(Integer.parseInt(query));
                     } catch (NumberFormatException e) {
-                        return Collections.emptyList();
+                        return Page.empty();
                     }
                     break;
                 case "publisher":
@@ -55,9 +56,9 @@ public class BookService {
                     book.setPublisher(publisher);
                     break;
                 case "author":
-                    return bookRepository.findAllByAuthorsNameContaining(query);
+                    return bookRepository.findDistinctByAuthorsNameContaining(query, pageable);
                 default:
-                    return bookRepository.findAll();
+                    return bookRepository.findAll(pageable);
             }
 
             ExampleMatcher matcher = ExampleMatcher.matchingAny()
@@ -66,10 +67,10 @@ public class BookService {
                     .withIgnoreCase();
 
             Example<Book> bookExample = Example.of(book, matcher);
-            return bookRepository.findAll(bookExample);
+            return bookRepository.findAll(bookExample, pageable);
         }
         else {
-            return bookRepository.findAll();
+            return bookRepository.findAll(pageable);
         }
     }
 
