@@ -8,7 +8,8 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 public class Book {
 
     @Id
@@ -21,7 +22,9 @@ public class Book {
     @Column(name = "year")
     private Integer publishingYear;
 
-    private String publisher;
+    @ManyToOne
+    @JoinColumn(name = "fk_publisher")
+    private Publisher publisher;
 
     @ManyToMany(mappedBy = "books")
     @OrderBy("name")

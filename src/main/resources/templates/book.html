@@ -19,12 +19,12 @@
             <span th:case="${1}">Author: </span>
             <span th:case="*">Authors: </span>
         </span>
-        <span th:each="a, stat : ${book.authors}">
+            <span th:each="a, stat : ${book.authors}">
             <a th:href="@{/(query=${a.name}, criteria=${'author'})}" th:text="${a.name}"></a>
             <span th:unless="${stat.last}">, </span>
         </span>
         </p>
-        <p th:text="'Publisher: ' + ${book.publisher}"></p>
+        <p th:text="'Publisher: ' + ${book.publisher.name}"></p>
         <hr/>
         <div>
             <form th:action="@{/book/{id}/author(id=${book.id})}" method="post">

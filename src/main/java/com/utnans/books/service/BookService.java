@@ -3,13 +3,15 @@ package com.utnans.books.service;
 import com.utnans.books.dto.BookDTO;
 import com.utnans.books.entity.Author;
 import com.utnans.books.entity.Book;
+import com.utnans.books.entity.Publisher;
 import com.utnans.books.repository.AuthorRepository;
 import com.utnans.books.repository.BookRepository;
+import com.utnans.books.repository.PublisherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.*;
@@ -25,6 +27,10 @@ public class BookService {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private PublisherRepository publisherRepository;
+
+    // Used the Example API for this because I did not know it before and it looked interesting.
     public List<Book> getBooks(Map<String, String> params) {
 
         if (params.containsKey("query") && !params.get("query").trim().isEmpty()) {
@@ -37,10 +43,16 @@ public class BookService {
                     book.setTitle(query);
                     break;
                 case "year":
-                    book.setPublishingYear(Integer.parseInt(query));
+                    try {
+                        book.setPublishingYear(Integer.parseInt(query));
+                    } catch (NumberFormatException e) {
+                        return Collections.emptyList();
+                    }
                     break;
                 case "publisher":
-                    book.setPublisher(query);
+                    Publisher publisher = new Publisher();
+                    publisher.setName(query);
+                    book.setPublisher(publisher);
                     break;
                 case "author":
                     return bookRepository.findAllByAuthorsNameContaining(query);
@@ -65,12 +77,23 @@ public class BookService {
         return bookRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
+    @Transactional
     public Book addBook(BookDTO bookDTO) {
         Book book = new Book();
-        // I would usually use a mapper class here but the method's short anyways
         book.setTitle(bookDTO.getTitle());
         book.setPublishingYear(bookDTO.getPublishingYear());
-        book.setPublisher(bookDTO.getPublisher());
+
+        Publisher publisher = new Publisher();
+        publisher.setName(bookDTO.getPublisher());
+        Optional<Publisher> candidate = publisherRepository.findOne(Example.of(publisher));
+
+        if (candidate.isPresent()) {
+            publisher = candidate.get();
+        } else {
+            publisherRepository.save(publisher);
+        }
+
+        book.setPublisher(publisher);
         bookRepository.save(book);
 
         List<Author> authors = Arrays.stream(bookDTO.getAuthors().split(","))

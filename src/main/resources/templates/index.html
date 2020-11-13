@@ -69,13 +69,16 @@
                 </span>
                 <span th:if="${#lists.size(book.authors) == 0}">-</span>
             </td>
-            <td th:text="${book.publisher}"></td>
+            <td th:text="${book.publisher.name}"></td>
             <td>
                 <a class="btn btn-primary btn-sm btn-block" th:href="@{/book/{id}(id=${book.id})}">View</a>
             </td>
         </tr>
         </tbody>
     </table>
+    <div th:if="${#lists.size(books) == 0}" class="mt-2">
+        <h2 class="text-center">No books found!</h2>
+    </div>
 </div>
 </body>
 </html>
